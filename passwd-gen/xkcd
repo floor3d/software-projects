@@ -1,0 +1,82 @@
+#!/usr/bin/python3
+
+import sys
+import random
+
+def main():
+    if "-h" in sys.argv or "--help" in sys.argv: 
+        print("""usage: xkcdpwgen [-h] [-w WORDS] [-c CAPS] [-n NUMBERS] [-s SYMBOLS]
+
+        Generate a secure, memorable password using the XKCD method
+
+        optional arguments:
+        -h, --help            show this help message and exit
+        -w WORDS, --words WORDS
+                              include WORDS words in the password (default=4)
+        -c CAPS, --caps CAPS  capitalize the first letter of CAPS random words
+                              (default=0)
+        -n NUMBERS, --numbers NUMBERS
+                              insert NUMBERS random numbers in the password
+                              (default=0)
+        -s SYMBOLS, --symbols SYMBOLS
+                              insert SYMBOLS random symbols in the password
+                              (default=0)
+        """)
+        return
+    numWords = 4
+    isCaps = ("-c" in sys.argv or "--caps" in sys.argv)
+    insertNumbers = 0
+    insertSymbols = ("-s" in sys.argv or "--symbols" in sys.argv)
+    if "-w" in sys.argv:
+        numWords = int(sys.argv[sys.argv.index("-w") + 1])
+    if "--words" in sys.argv:
+        numWords = int(sys.argv[sys.argv.index("--words") + 1])
+    if "-n" in sys.argv:
+        insertNumbers = int(sys.argv[sys.argv.index("-n") + 1])
+    if "--numbers" in sys.argv:
+        insertNumbers = int(sys.argv[sys.argv.index("--numbers") + 1])
+    if "-s" in sys.argv:
+        insertSymbols = int(sys.argv[sys.argv.index("-s") + 1])
+    if "--symbols" in sys.argv:
+        insertSymbols = int(sys.argv[sys.argv.index("--symbols") + 1])
+    createRandomPass(numWords, isCaps, insertNumbers, insertSymbols)
+
+
+def createRandomPass(numWords, isCaps, insertNumbers, insertSymbols):
+    random.seed()
+    numsArr = []
+    symsArr = []
+    with open("words.txt") as f:
+        passwds = f.readlines()
+        rng = random.choices(passwds, k=numWords)
+        if insertNumbers > 0:
+            numsArr = random.choices([0,1,2,3,4,5,6,7,8,9], k=insertNumbers)
+        if insertSymbols > 0:
+            symsArr = random.choices(["!", "@", "#", "$", "%", "^", "*", "(", ")", "-"],
+            k=insertSymbols)
+        ctr = 0
+        for word in rng:
+            rng[ctr] = word.replace("\n", "")
+            if isCaps:
+                rng[ctr] = rng[ctr].capitalize()
+            ctr += 1
+        ctr = 0
+        rng = insert(rng, numsArr, numWords)
+        rng = insert(rng, symsArr, numWords)
+        print(''.join(rng))
+
+
+def insert(initialArr, xtraCharsArr, numWordsInRng):
+    if len(xtraCharsArr) == 0:
+        return initialArr
+    for num in xtraCharsArr:
+            placement = random.randrange(0, numWordsInRng, 1)
+            beforeOrAfter = random.randrange(0,2,1)
+            if beforeOrAfter == 1:
+                initialArr[placement] = initialArr[placement] + str(num)
+            else: 
+                initialArr[placement] = str(num) + initialArr[placement]
+    return initialArr
+
+if __name__ == "__main__":
+    main()
