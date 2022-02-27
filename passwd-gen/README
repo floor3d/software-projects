@@ -1,0 +1,3 @@
+xkcd is a python script used for generating random, secure passwords.
+While not fully optimized for efficiency and readability, this script makes a somewhat customizable,
+random, and secure password for usage.
